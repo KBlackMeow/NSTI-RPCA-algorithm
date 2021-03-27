@@ -35,7 +35,7 @@ if isfield(params,'tos') tos = params.tos; end
 if isfield(params,'alpha') alpha = params.alpha; end
 
 % Library paths
-% addpath PROPACK;
+addpath PROPACK;
 % addpath MinMaxSelection;
 
 % Setting up
@@ -64,24 +64,13 @@ t1 = tic; t = 1;
 
 % Initial sparse projection
 fprintf('Initial sparse projection; time %f \n', toc(t1));
-tos=sum(abs(Y(:)))/(d1*d2)*alpha;
-
-% S=sign(Y) .* max(abs(Y) - tos, 0);
-
 
 % Initial factorization
 fprintf('Initial SVD; time %f \n', toc(t1));
-% [U,Sig,V]=lansvd((Y-S)/p,r,'L');
+
 [U,Sig,V]=lansvd((Y)/p,r,'L');
-% 
-% [U,Sig,V] = svd((Y-S)/p);
-% Sig(1:5,1:5)
 U = U(:,1:r) * sqrt(Sig(1:r,1:r));
 V = V(:,1:r) * sqrt(Sig(1:r,1:r));
-
-% U = U(:,1:r) ;
-% V = V(:,1:r) * Sig(1:r,1:r);
-% U'*U
 
 % Compute the initial error
 err(t)  = inf;
@@ -123,35 +112,32 @@ while ~converged
      err(t) = (norm(S, 1)+norm(E, 'fro'))/Ynormfro;
 %     clearvars S;
     
-    
+% ???? 
+
 %     hess = V'*V;
 %     hess = inv(hess);
 %     Unew = U +  steplength *( (E * V) /p)*hess;
 %     hess = U'*U;
 %     hess = inv(hess);
 %     Vnew = V + steplength *( (U' * E)' /p)*hess;
+%  ?????
 % 
     hess = V'*V;
     hess = inv(hess);
     Unew = U +  ( (E * V) /p)*hess;
     hess = U'*U;
     hess = inv(hess);
-    Vnew = V + ( (U' * E)' /p)*hess;
-%     Vnew = V + ( (E' * U) /p)*hess;
-
-%      Yt=Y-S;
-%      Unew=(Yt)*V*inv(V'*V);
-%      Vnew=(Yt)'*U*inv(U'*U);
-
+    Vnew = V + ( E'*U /p)*hess;
+   
     U = Unew;
     V = Vnew;
 % 
 %     hess = V'*V;
 %     hess = inv(hess);
-%     U = U +  ( (E * V) /p)*hess;
+%     U =U +  hess*( (E * V) /p);
 %     hess = U'*U;
 %     hess = inv(hess);
-%     V = V + ( (U' * E)' /p)*hess;
+%     V = V + hess*( E'*U /p);
 
     
     %% Compute error
