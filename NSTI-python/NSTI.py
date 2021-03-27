@@ -31,7 +31,7 @@ def NSTI(Y,r,alpha,max_iter=30,tol=0.01):
         hess= np.linalg.inv(np.dot(V.T,V))
         Unew = U + np.dot(np.dot(E,V),hess)
         hess= np.linalg.inv(np.dot(U.T,U))
-        Vnew = V + np.dot(np.dot(U.T,E).T,hess)
+        Vnew = V + np.dot(np.dot(E.T,U),hess)
 
         U=Unew
         V=Vnew
@@ -65,7 +65,7 @@ if __name__ == '__main__':
     r  = 2
     step_const = 10
     max_iter   = 1000
-    tol        = 0.02
+    tol        = 0.0002
     tos=2
     L, S = NSTI(D, r,0.1, max_iter,tol)
 
